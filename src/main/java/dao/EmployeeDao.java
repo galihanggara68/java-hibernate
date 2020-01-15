@@ -6,6 +6,7 @@ import javax.persistence.Query;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.CreateKeySecondPass;
 
 import util.Config;
 import model.Employee;
@@ -19,10 +20,9 @@ public class EmployeeDao {
 	
 	public List<Employee> getAll(){
 		Session session = sessionFactory.openSession();
-		String query = "from Employee e";
+		String query = "from Employee e where e.departmentId is not null";
 		List<Employee> employees = 
 				session.createQuery(query).list();
-		session.close();
 		return employees;
 	}
 	
@@ -32,7 +32,6 @@ public class EmployeeDao {
 		Query q = session.createQuery(query);
 		q.setParameter("empId", employeeId);
 		Employee emp = (Employee)q.getSingleResult();
-		session.close();
 		return emp;
 //		Employee employee = 
 //				(Employee)session.createQuery(query)
@@ -42,15 +41,9 @@ public class EmployeeDao {
 	
 	public void insertEmployee(Employee employee){
 		Session session = sessionFactory.openSession();
-		try{
-			session.beginTransaction();
-			if(employee.getEmployeeId() == 0) 
-				throw new Exception("Employee Id is 0");
-			session.save(employee);
-			session.getTransaction().commit();
-		}catch(Exception e){
-			session.getTransaction().rollback();
-		}
+		session.beginTransaction();
+		session.save(employee);
+		session.getTransaction().commit();
 		session.close();
 	}
 	
@@ -79,7 +72,14 @@ public class EmployeeDao {
 		session.close();
 	}
 	
-	public void deleteById(int employeeId){
+	public int getMaxSalary(){
+		Session session = sessionFactory.openSession();
 		
+		String query = 
+			"select max(salary) from Employee";
+		int salary = 
+				(Integer)session.createQuery(query).getSingleResult();
+		session.close();
+		return salary;
 	}
 }

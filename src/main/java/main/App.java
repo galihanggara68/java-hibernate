@@ -2,6 +2,7 @@ package main;
 
 import java.util.List;
 
+import model.Department;
 import model.Employee;
 
 import org.hibernate.Session;
@@ -14,12 +15,13 @@ public class App {
 	public static void main(String[] args) {
 		EmployeeDao empDao = new EmployeeDao();
 		
-		Employee emp = empDao.getOne(989);
-		emp.setFirstName("asasasaasa");
-		empDao.updateEmployee(emp);
+		Employee emp = empDao.getOne(100); // Steven King
+		Department dept = emp.getDepartment(); // Department si Steven
 		
-		Employee display = empDao.getOne(989);
-		System.out.println(display.getFirstName());
+		List<Employee> employees = dept.getEmployees();
+		for(Employee e : employees){
+			System.out.println(e.getFirstName());
+		}
 	}
 
 }
